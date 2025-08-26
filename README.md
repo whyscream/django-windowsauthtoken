@@ -25,6 +25,8 @@ MIDDLEWARE = [
 ]
 ```
 
+Now configure IIS to integrate with your Django application using the HttpPlatformHandler, and ensure that Windows Authentication is enabled for your site.
+
 ## Usage
 
 Once the middleware is added, it will automatically handle the extraction of the Windows Authentication token from the `X-IIS-WindowsAuthToken` header and set the `REMOTE_USER` variable. You can then use Django's authentication system as usual.

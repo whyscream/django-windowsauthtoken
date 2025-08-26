@@ -142,13 +142,20 @@ def test_retrieve_auth_user_details_success(mock_pywin32):
     mock_pywin32.win32api.CloseHandle.assert_called_once()
 
 
-def test_configure_pywin32_error_handling(monkeypatch):
-    monkeypatch.setenv("WINDOWSAUTHTOKEN_IGNORE_PYWIN32_ERRORS", "false")
-    # Reload the middleware module to apply the environment variable change
-    import importlib
+def test_middleware_init_pywin32_error_handling(mocker):
+    mocker.patch("django_windowsauthtoken.middleware._IGNORE_PYWIN32_ERRORS", False)
+    mocker.patch("django_windowsauthtoken.middleware.win32security", None)
+    mocker.patch("django_windowsauthtoken.middleware.pywintypes", None)
+    mocker.patch("django_windowsauthtoken.middleware.win32api", None)
 
-    from django_windowsauthtoken import middleware
-
+    mock_get_response = mocker.Mock()
     with pytest.raises(ImproperlyConfigured) as excinfo:
-        importlib.reload(middleware)
+        WindowsAuthTokenMiddleware(mock_get_response)
+    assert "pywin32 is required for Windows Authentication Token middleware." in str(excinfo.value)
+
+
+def test_retrieve_auth_user_details_pywin32_error_handling(monkeypatch, mocker):
+    mocker.patch("django_windowsauthtoken.middleware._IGNORE_PYWIN32_ERRORS", False)
+    with pytest.raises(ImproperlyConfigured) as excinfo:
+        WindowsAuthTokenMiddleware.retrieve_auth_user_details("123")
     assert "pywin32 is required for Windows Authentication Token middleware." in str(excinfo.value)

@@ -8,18 +8,16 @@ logger = logging.getLogger("windowsauthtoken")
 _IGNORE_PYWIN32_ERRORS = os.getenv("WINDOWSAUTHTOKEN_IGNORE_PYWIN32_ERRORS", "false") == "true"
 """Flag to ignore platform-specific errors, useful for non-Windows environments."""
 
-try:
+try:  # pragma: no cover
     import pywintypes
     import win32api
     import win32security
 except ImportError:
-    if _IGNORE_PYWIN32_ERRORS:
-        logger.warning("pywin32 is not installed, but platform errors are being ignored.")
-        pywintypes = None
-        win32api = None
-        win32security = None
-    else:
-        raise ImproperlyConfigured("pywin32 is required for Windows Authentication Token middleware.")
+    if _IGNORE_PYWIN32_ERRORS:  # pragma: no cover
+        logger.warning("pywin32 is not installed, but errors are being ignored.")
+    pywintypes = None
+    win32api = None
+    win32security = None
 
 
 class WindowsAuthTokenMiddleware:
@@ -29,6 +27,9 @@ class WindowsAuthTokenMiddleware:
 
     def __init__(self, get_response):
         self.get_response = get_response
+
+        if not any([win32security, pywintypes, win32api]) and not _IGNORE_PYWIN32_ERRORS:
+            raise ImproperlyConfigured("pywin32 is required for Windows Authentication Token middleware.'")
 
     def __call__(self, request):
         auth_token = request.headers.get("X-IIS-WindowsAuthToken", "")
@@ -62,8 +63,8 @@ class WindowsAuthTokenMiddleware:
         Raises:
             ValueError: If the token is invalid or cannot be processed.
         """
-        if any([win32security, pywintypes, win32api]) is None and not _IGNORE_PYWIN32_ERRORS:
-            raise ValueError("pywin32 is not available to process the token.")
+        if not any([win32security, pywintypes, win32api]) and not _IGNORE_PYWIN32_ERRORS:
+            raise ImproperlyConfigured("pywin32 is required for Windows Authentication Token middleware.'")
 
         try:
             token_handle = int(auth_token, 16)

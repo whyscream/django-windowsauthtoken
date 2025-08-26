@@ -30,7 +30,7 @@ class WindowsAuthTokenMiddleware:
         auth_token = request.headers.get("X-IIS-WindowsAuthToken", "")
         if auth_token:
             try:
-                username, domain = self.retrieve_username(auth_token)
+                username, domain = self.retrieve_auth_user_details(auth_token)
             except ValueError:
                 logger.warning("Could not retrieve username from auth token.")
                 username = None
@@ -58,11 +58,11 @@ class WindowsAuthTokenMiddleware:
         Raises:
             ValueError: If the token is invalid or cannot be processed.
         """
-        if win32security is None:
+        if any([win32security,pywintypes, win32api]) is None and not _IGNORE_PLATFORM_ERRORS:
             raise ValueError("pywin32 is not available to process the token.")
 
         try:
-            token_handle = int(token, 16)
+            token_handle = int(auth_token, 16)
         except ValueError:
             raise ValueError("Invalid token format.")
 
@@ -70,18 +70,17 @@ class WindowsAuthTokenMiddleware:
             # See https://learn.microsoft.com/en-us/windows/win32/api/winnt/ne-winnt-token_information_class
             token_information_class = 1
             security_id, _ = win32security.GetTokenInformation(token_handle, token_information_class)
-            logger.debug(f"Retrieved SID for auth token: {auth_token=} {token_handle=} {security_id=}")
+            logger.debug(f"Retrieved security ID for auth token: {auth_token=} {token_handle=} {security_id=}")
         except pywintypes.error as err:
-            raise ValueError(f"Token handle is invalid, can't retrieve SID: {err}")
-            return _invalid
+            raise ValueError(f"Can't retrieve Security ID for token: {err}")
         finally:
             win32api.CloseHandle(token_handle)
 
         try:
             user, domain, account_type = win32security.LookupAccountSid(None, security_id)
             logger.debug(f"Retrieved account details for SID: {security_id=} {user=} {domain=} {account_type=}")
-        except TypeError as err:
-            # Not really sure what other exceptions we should catch
+        except (pywintypes.error, TypeError) as err:
+            # TypeError can occur if the SID has an incorrect type
             raise ValueError(f"Can't retrieve account details for SID: {err}")
 
         return user, domain

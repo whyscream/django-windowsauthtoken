@@ -11,3 +11,4 @@ src/*.egg-info
 
 # Test and coverage files
 .coverage
+db.sqlite3

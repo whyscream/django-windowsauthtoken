@@ -1,6 +1,7 @@
 from collections import namedtuple
 
 import pytest
+from django.core.exceptions import ImproperlyConfigured
 
 from django_windowsauthtoken.middleware import WindowsAuthTokenMiddleware
 
@@ -139,3 +140,15 @@ def test_retrieve_auth_user_details_success(mock_pywin32):
     mock_pywin32.win32security.GetTokenInformation.assert_called_once_with(291, 1)
     mock_pywin32.win32security.LookupAccountSid.assert_called_once_with(None, "mocked_sid")
     mock_pywin32.win32api.CloseHandle.assert_called_once()
+
+
+def test_configure_platform_error_handling(monkeypatch):
+    monkeypatch.setenv("WINDOWSAUTHTOKEN_IGNORE_PLATFORM_ERRORS", "false")
+    # Reload the middleware module to apply the environment variable change
+    import importlib
+
+    from django_windowsauthtoken import middleware
+
+    with pytest.raises(ImproperlyConfigured) as excinfo:
+        importlib.reload(middleware)
+    assert "pywin32 is required for Windows Authentication Token middleware." in str(excinfo.value)

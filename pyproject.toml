@@ -1,0 +1,23 @@
+[project]
+name = "django-windowsauthtoken"
+version = "0.1.0"
+description = "Windows Authentication Token handling for Django"
+readme = "README.md"
+authors = [
+    { name = "Tom Hendrikx", email = "tom@whyscream.net" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "django>=5.2",
+    "pywin32>=311; sys_platform == 'win32'",
+]
+
+[build-system]
+requires = ["setuptools>=66.1.0"]
+build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+    "pytest-mock>=3.14.1",
+]

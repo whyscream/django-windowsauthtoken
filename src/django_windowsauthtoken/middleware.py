@@ -5,15 +5,16 @@ from django.core.exceptions import ImproperlyConfigured
 
 logger = logging.getLogger("windowsauthtoken")
 
-_IGNORE_PLATFORM_ERRORS = os.getenv("WINDOWSAUTHTOKEN_IGNORE_PLATFORM_ERRORS", "false") == "true"
+_IGNORE_PYWIN32_ERRORS = os.getenv("WINDOWSAUTHTOKEN_IGNORE_PYWIN32_ERRORS", "false") == "true"
+"""Flag to ignore platform-specific errors, useful for non-Windows environments."""
 
 try:
     import pywintypes
     import win32api
     import win32security
 except ImportError:
-    if _IGNORE_PLATFORM_ERRORS:
-        logger.info("pywin32 is not installed, but platform errors are being ignored.")
+    if _IGNORE_PYWIN32_ERRORS:
+        logger.warning("pywin32 is not installed, but platform errors are being ignored.")
         pywintypes = None
         win32api = None
         win32security = None
@@ -61,7 +62,7 @@ class WindowsAuthTokenMiddleware:
         Raises:
             ValueError: If the token is invalid or cannot be processed.
         """
-        if any([win32security, pywintypes, win32api]) is None and not _IGNORE_PLATFORM_ERRORS:
+        if any([win32security, pywintypes, win32api]) is None and not _IGNORE_PYWIN32_ERRORS:
             raise ValueError("pywin32 is not available to process the token.")
 
         try:

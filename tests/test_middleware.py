@@ -142,8 +142,8 @@ def test_retrieve_auth_user_details_success(mock_pywin32):
     mock_pywin32.win32api.CloseHandle.assert_called_once()
 
 
-def test_configure_platform_error_handling(monkeypatch):
-    monkeypatch.setenv("WINDOWSAUTHTOKEN_IGNORE_PLATFORM_ERRORS", "false")
+def test_configure_pywin32_error_handling(monkeypatch):
+    monkeypatch.setenv("WINDOWSAUTHTOKEN_IGNORE_PYWIN32_ERRORS", "false")
     # Reload the middleware module to apply the environment variable change
     import importlib
 

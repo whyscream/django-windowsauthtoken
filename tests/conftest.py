@@ -5,7 +5,7 @@ from django.conf import settings
 
 def pytest_configure():
     # Make sure that we can run all tests even on non-Windows platforms
-    os.environ.setdefault("WINDOWSAUTHTOKEN_IGNORE_PLATFORM_ERRORS", "true")
+    os.environ.setdefault("WINDOWSAUTHTOKEN_IGNORE_PYWIN32_ERRORS", "true")
     # Set up Django settings for the tests
     settings.configure(
         MIDDLEWARE=[

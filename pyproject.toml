@@ -24,3 +24,11 @@ dev = [
     "pytest-django>=4.11.1",
     "pytest-mock>=3.14.1",
 ]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "I", # isort
+]

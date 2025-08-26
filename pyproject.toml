@@ -6,6 +6,13 @@ readme = "README.md"
 authors = [
     { name = "Tom Hendrikx", email = "tom@whyscream.net" }
 ]
+classifiers = [
+    "Programming Language :: Python :: 3.13",
+    "Framework :: Django",
+    "License :: OSI Approved :: BSD-3-Clause",
+    "Intended Audience :: Developers",
+    "Operating System :: Windows",
+]
 requires-python = ">=3.13"
 dependencies = [
     "django>=5.2",
@@ -21,6 +28,7 @@ dev = [
     "ipdb>=0.13.13",
     "pre-commit>=4.3.0",
     "pytest>=8.4.1",
+    "pytest-cov>=6.2.1",
     "pytest-django>=4.11.1",
     "pytest-mock>=3.14.1",
 ]
@@ -32,3 +40,10 @@ line-length = 120
 select = [
     "I", # isort
 ]
+
+[tool.coverage.run]
+branch = true
+source = ["django_windowsauthtoken"]
+
+[tool.pytest.ini_options]
+addopts = "--cov --cov-report=term-missing"

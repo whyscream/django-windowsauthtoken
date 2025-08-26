@@ -8,7 +8,9 @@ logger = logging.getLogger("windowsauthtoken")
 _IGNORE_PLATFORM_ERRORS = os.getenv("WINDOWSAUTHTOKEN_IGNORE_PLATFORM_ERRORS", "false") == "true"
 
 try:
-    import pywintypes, win32api, win32security
+    import pywintypes
+    import win32api
+    import win32security
 except ImportError:
     if _IGNORE_PLATFORM_ERRORS:
         logger.info("pywin32 is not installed, but platform errors are being ignored.")
@@ -23,6 +25,7 @@ class WindowsAuthTokenMiddleware:
     """
     Middleware to handle Windows Authentication Tokens and convert them to a `REMOTE_USER` environment variable.
     """
+
     def __init__(self, get_response):
         self.get_response = get_response
 
@@ -39,7 +42,7 @@ class WindowsAuthTokenMiddleware:
             if username and domain:
                 # Set the REMOTE_USER environment variable
                 domain_user = rf"{domain}\{username}"
-                request.META['REMOTE_USER'] = domain_user
+                request.META["REMOTE_USER"] = domain_user
                 logger.debug(f"Set REMOTE_USER to {domain_user}")
 
         return self.get_response(request)
@@ -58,7 +61,7 @@ class WindowsAuthTokenMiddleware:
         Raises:
             ValueError: If the token is invalid or cannot be processed.
         """
-        if any([win32security,pywintypes, win32api]) is None and not _IGNORE_PLATFORM_ERRORS:
+        if any([win32security, pywintypes, win32api]) is None and not _IGNORE_PLATFORM_ERRORS:
             raise ValueError("pywin32 is not available to process the token.")
 
         try:

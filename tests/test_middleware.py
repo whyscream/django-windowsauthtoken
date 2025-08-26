@@ -4,28 +4,24 @@ import pytest
 
 from django_windowsauthtoken.middleware import WindowsAuthTokenMiddleware
 
+
 @pytest.fixture()
 def mock_pywin32(mocker):
     """Fixture to mock pywin32 components used in the middleware."""
-    mock_win32security = mocker.patch(
-        "django_windowsauthtoken.middleware.win32security"
-    )
-    mock_win32api = mocker.patch(
-        "django_windowsauthtoken.middleware.win32api"
-    )
-    mock_pywintypes = mocker.patch(
-        "django_windowsauthtoken.middleware.pywintypes"
-    )
+    mock_win32security = mocker.patch("django_windowsauthtoken.middleware.win32security")
+    mock_win32api = mocker.patch("django_windowsauthtoken.middleware.win32api")
+    mock_pywintypes = mocker.patch("django_windowsauthtoken.middleware.pywintypes")
     mock_pywintypes.error = Pywin32MockException
 
     # Return a namedtuple for easier access to the mocks
     pywin32_mock = namedtuple("pywin32_mock", ["win32security", "win32api", "pywintypes"])
     return pywin32_mock(mock_win32security, mock_win32api, mock_pywintypes)
 
+
 def test_middleware_sets_remote_user(mocker, rf):
     mocker.patch(
         "django_windowsauthtoken.middleware.WindowsAuthTokenMiddleware.retrieve_auth_user_details",
-        return_value=("testuser", "TESTDOMAIN")
+        return_value=("testuser", "TESTDOMAIN"),
     )
 
     mock_get_response = mocker.Mock()
@@ -38,8 +34,9 @@ def test_middleware_sets_remote_user(mocker, rf):
     response = middleware(request)
 
     assert response == mock_get_response.return_value
-    assert request.META['REMOTE_USER'] == r"TESTDOMAIN\testuser"
+    assert request.META["REMOTE_USER"] == r"TESTDOMAIN\testuser"
     mock_get_response.assert_called_once_with(request)
+
 
 def test_middleware_no_token(rf, mocker):
     mock_get_response = mocker.Mock()
@@ -52,13 +49,14 @@ def test_middleware_no_token(rf, mocker):
     response = middleware(request)
 
     assert response == mock_get_response.return_value
-    assert 'REMOTE_USER' not in request.META
+    assert "REMOTE_USER" not in request.META
     mock_get_response.assert_called_once_with(request)
+
 
 def test_middleware_invalid_token(mocker, rf):
     mocker.patch(
         "django_windowsauthtoken.middleware.WindowsAuthTokenMiddleware.retrieve_auth_user_details",
-        side_effect=ValueError("Invalid token")
+        side_effect=ValueError("Invalid token"),
     )
 
     mock_get_response = mocker.Mock()
@@ -71,7 +69,7 @@ def test_middleware_invalid_token(mocker, rf):
     response = middleware(request)
 
     assert response == mock_get_response.return_value
-    assert 'REMOTE_USER' not in request.META
+    assert "REMOTE_USER" not in request.META
     mock_get_response.assert_called_once_with(request)
 
 
@@ -80,10 +78,11 @@ def test_retrieve_auth_user_details_invalid_token():
         WindowsAuthTokenMiddleware.retrieve_auth_user_details("invalid_token")
     assert "Invalid token format" in str(excinfo.value)
 
+
 class Pywin32MockException(Exception):
     """Mock exception to simulate pywin32 errors."""
-    pass
 
+    pass
 
 
 def test_retrieve_auth_user_details_no_token_information(mock_pywin32):
@@ -126,7 +125,11 @@ def test_retrieve_auth_user_details_success(mock_pywin32):
     # GetTokenInformation returns a SID object and some integer value
     mock_pywin32.win32security.GetTokenInformation.return_value = ("mocked_sid", 0)
     # LookupAccountSid returns a tuple of (username, domain, account_type)
-    mock_pywin32.win32security.LookupAccountSid.return_value = ("testuser", "TESTDOMAIN", 1)
+    mock_pywin32.win32security.LookupAccountSid.return_value = (
+        "testuser",
+        "TESTDOMAIN",
+        1,
+    )
 
     username, domain = WindowsAuthTokenMiddleware.retrieve_auth_user_details("123")
 

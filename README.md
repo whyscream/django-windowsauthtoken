@@ -18,8 +18,9 @@ After installation, add the middleware to your Django settings:
 ```python
 MIDDLEWARE = [
     ...,
+    "django.auth.middleware.AuthenticationMiddleware",
+    # Ensure this comes before RemoteUserMiddleware
     "django_windowsauthtoken.middleware.WindowsAuthTokenMiddleware",
-    # Ensure this is placed before any authentication middleware
     # You'll likely want to use Django's RemoteUserMiddleware too, to process the REMOTE_USER variable
     "django.contrib.auth.middleware.RemoteUserMiddleware",
     ...
@@ -31,6 +32,8 @@ Now configure IIS to integrate with your Django application [using the HttpPlatf
 ## Usage
 
 Once the middleware is added, it will automatically handle the extraction of the Windows Authentication token from the `X-IIS-WindowsAuthToken` header and set the `REMOTE_USER` variable. You can then use Django's authentication system as usual.
+
+The RemoteUserMiddleware will use the `REMOTE_USER` variable to authenticate users against Django's user model. If a user with the given username does not exist, it will create a new user if `CREATE_UNKNOWN_USER` is set to `True` (which is the default). See the [Django documentation](https://docs.djangoproject.com/en/stable/topics/auth/default/#django.contrib.auth.middleware.RemoteUserMiddleware) for more details on how RemoteUserMiddleware works.
 
 ## Username format
 

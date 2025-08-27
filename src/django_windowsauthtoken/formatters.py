@@ -25,4 +25,4 @@ def format_email_like(user: str, domain: str) -> str:
     return f"{user}@{domain}"
 
 
-DEFAULT_FORMATTER = f"{__package__}.formatters.format_username_domain_user"
+DEFAULT_FORMATTER = f"{__name__}.format_username_domain_user"

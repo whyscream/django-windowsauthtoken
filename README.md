@@ -27,13 +27,22 @@ MIDDLEWARE = [
 ]
 ```
 
+If you're using Django's `RemoteUserMiddleware`, you might also want to set:
+
+```python
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.RemoteUserBackend",
+    ...
+]
+```
+
 Now configure IIS to integrate with your Django application [using the HttpPlatformHandler](https://learn.microsoft.com/en-us/visualstudio/python/configure-web-apps-for-iis-windows?view=vs-2022#option-1-configure-the-httpplatformhandler), and ensure that [Windows Authentication is enabled](https://learn.microsoft.com/en-us/iis/configuration/system.webServer/security/authentication/windowsAuthentication/) for your site.
 
 ## Usage
 
 Once the middleware is added, it will automatically handle the extraction of the Windows Authentication token from the `X-IIS-WindowsAuthToken` header and set the `REMOTE_USER` variable. You can then use Django's authentication system as usual.
 
-The RemoteUserMiddleware will use the `REMOTE_USER` variable to authenticate users against Django's user model. If a user with the given username does not exist, it will create a new user if `CREATE_UNKNOWN_USER` is set to `True` (which is the default). See the [Django documentation](https://docs.djangoproject.com/en/stable/topics/auth/default/#django.contrib.auth.middleware.RemoteUserMiddleware) for more details on how RemoteUserMiddleware works.
+The RemoteUserMiddleware will use the `REMOTE_USER` variable to authenticate users against Django's user model. If a user with the given username does not exist, it will by default create a new user. See the Django documentation for more details on [how RemoteUserMiddleware works](https://docs.djangoproject.com/en/stable/topics/auth/default/#django.contrib.auth.middleware.RemoteUserMiddleware).
 
 ## Username format
 

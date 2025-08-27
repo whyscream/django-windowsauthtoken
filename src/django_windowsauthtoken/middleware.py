@@ -29,6 +29,12 @@ class WindowsAuthTokenMiddleware:
     Middleware to handle Windows Authentication Tokens and convert them to a `REMOTE_USER` environment variable.
     """
 
+    sync_capable = True
+    async_capable = True
+
+    header_name = "X-IIS-WindowsAuthToken"
+    """The HTTP header name where the Windows Authentication Token is expected."""
+
     def __init__(self, get_response):
         self.get_response = get_response
         self.username_formatter: str = getattr(settings, "WINDOWSAUTHTOKEN_USERNAME_FORMATTER", DEFAULT_FORMATTER)
@@ -37,7 +43,7 @@ class WindowsAuthTokenMiddleware:
             raise ImproperlyConfigured("pywin32 is required for Windows Authentication Token middleware.'")
 
     def __call__(self, request):
-        auth_token = request.headers.get("X-IIS-WindowsAuthToken", "")
+        auth_token = request.headers.get(self.header_name, "")
         if auth_token:
             try:
                 username, domain = self.retrieve_auth_user_details(auth_token)
@@ -61,6 +67,10 @@ class WindowsAuthTokenMiddleware:
         if formatted_user is not None:
             # Set the REMOTE_USER environment variable
             request.META["REMOTE_USER"] = formatted_user
+            # In async contexts, there is no environment variable, so we set it in META as a HTTP header,
+            # just like the RemoteUserMiddleware expects it for async requests.
+            request.META["HTTP_REMOTE_USER"] = formatted_user
+
             logger.debug(f"Set REMOTE_USER to {formatted_user}")
 
         return self.get_response(request)

@@ -227,7 +227,7 @@ def test_combine_with_remote_user_middleware(mocker, settings, client):
     User = get_user_model()
     assert User.objects.count() == 0
 
-    response = client.get("/", HTTP_X_IIS_WindowsAuthToken="valid_token")
+    response = client.get("/", headers={"X-IIS-WindowsAuthToken": "valid_token"})
 
     assert response.status_code == 200
     assert response.wsgi_request.META["REMOTE_USER"] == "testuser@TESTDOMAIN"
@@ -239,4 +239,35 @@ def test_combine_with_remote_user_middleware(mocker, settings, client):
     assert user.username == "testuser@TESTDOMAIN"
 
 
-# TODO: same test as above but using async
+@pytest.mark.asyncio
+@pytest.mark.django_db
+async def test_combine_with_remote_user_middleware_async(mocker, settings, async_client):
+    mocker.patch(
+        "django_windowsauthtoken.middleware.WindowsAuthTokenMiddleware.retrieve_auth_user_details",
+        return_value=("testuser", "TESTDOMAIN"),
+    )
+
+    settings.MIDDLEWARE = [
+        "django.contrib.sessions.middleware.SessionMiddleware",
+        "django.contrib.auth.middleware.AuthenticationMiddleware",
+        "django_windowsauthtoken.middleware.WindowsAuthTokenMiddleware",
+        "django.contrib.auth.middleware.RemoteUserMiddleware",
+    ]
+    settings.AUTHENTICATION_BACKENDS = [
+        "django.contrib.auth.backends.RemoteUserBackend",
+    ]
+    settings.WINDOWSAUTHTOKEN_USERNAME_FORMATTER = "django_windowsauthtoken.formatters.format_email_like"
+
+    User = get_user_model()
+    assert await User.objects.acount() == 0
+
+    response = await async_client.get("/", headers={"X-IIS-WindowsAuthToken": "valid_token"})
+
+    assert response.status_code == 200
+    assert response.asgi_request.META["HTTP_REMOTE_USER"] == "testuser@TESTDOMAIN"
+    assert response.asgi_request.user.is_authenticated is True
+
+    assert await User.objects.acount() == 1, "User should be created by RemoteUserMiddleware"
+    user = await User.objects.afirst()
+    assert user == response.asgi_request.user
+    assert user.username == "testuser@TESTDOMAIN"

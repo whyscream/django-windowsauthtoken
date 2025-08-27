@@ -1,22 +1,23 @@
 import os
 
 from django.conf import settings
+from django.http import HttpResponse
+from django.urls import path
 
 
 def pytest_configure():
     # Make sure that we can run all tests even on non-Windows platforms
     os.environ.setdefault("WINDOWSAUTHTOKEN_IGNORE_PYWIN32_ERRORS", "true")
+
     # Set up Django settings for the tests
     settings.configure(
-        MIDDLEWARE=[
-            "django.middleware.security.SecurityMiddleware",
-            "django.contrib.sessions.middleware.SessionMiddleware",
-            "django.middleware.common.CommonMiddleware",
-            "django.middleware.csrf.CsrfViewMiddleware",
-            # Add the WindowsAuthTokenMiddleware here
-            "django_windowsauthtoken.middleware.WindowsAuthTokenMiddleware",
-            "django.contrib.auth.middleware.AuthenticationMiddleware",
-            "django.contrib.messages.middleware.MessageMiddleware",
-            "django.middleware.clickjacking.XFrameOptionsMiddleware",
-        ]
+        DATABASES={"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": ":memory:"}},
+        INSTALLED_APPS=[
+            "django.contrib.contenttypes",
+            "django.contrib.auth",
+            "django.contrib.sessions",
+            "django.contrib.admin",
+        ],
+        ROOT_URLCONF="tests.urlconf",
+        SECRET_KEY="django-insecure-test-key",
     )

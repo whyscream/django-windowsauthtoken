@@ -2,6 +2,7 @@ import logging
 from collections import namedtuple
 
 import pytest
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
 
 from django_windowsauthtoken.formatters import FormattingError
@@ -203,3 +204,39 @@ def test_username_formatter_raises(mocker, caplog):
     mock_get_response.assert_called_once_with(request)
 
     assert "Domain and user cannot be empty." in caplog.text
+
+
+@pytest.mark.django_db
+def test_combine_with_remote_user_middleware(mocker, settings, client):
+    mocker.patch(
+        "django_windowsauthtoken.middleware.WindowsAuthTokenMiddleware.retrieve_auth_user_details",
+        return_value=("testuser", "TESTDOMAIN"),
+    )
+
+    settings.MIDDLEWARE = [
+        "django.contrib.sessions.middleware.SessionMiddleware",
+        "django.contrib.auth.middleware.AuthenticationMiddleware",
+        "django_windowsauthtoken.middleware.WindowsAuthTokenMiddleware",
+        "django.contrib.auth.middleware.RemoteUserMiddleware",
+    ]
+    settings.AUTHENTICATION_BACKENDS = [
+        "django.contrib.auth.backends.RemoteUserBackend",
+    ]
+    settings.WINDOWSAUTHTOKEN_USERNAME_FORMATTER = "django_windowsauthtoken.formatters.format_email_like"
+
+    User = get_user_model()
+    assert User.objects.count() == 0
+
+    response = client.get("/", HTTP_X_IIS_WindowsAuthToken="valid_token")
+
+    assert response.status_code == 200
+    assert response.wsgi_request.META["REMOTE_USER"] == "testuser@TESTDOMAIN"
+    assert response.wsgi_request.user.is_authenticated is True
+
+    assert User.objects.count() == 1, "User should be created by RemoteUserMiddleware"
+    user = User.objects.first()
+    assert user == response.wsgi_request.user
+    assert user.username == "testuser@TESTDOMAIN"
+
+
+# TODO: same test as above but using async

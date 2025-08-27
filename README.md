@@ -61,3 +61,31 @@ WINDOWSAUTHTOKEN_USERNAME_FORMATTER = "django_windowsauthtoken.formatters.format
 ```
 
 You can also implement your own custom formatter function. The function should take two arguments: `username` and `domain`, and return the formatted username.
+
+## Development
+
+To contribute to the development of this package, clone the repository and install the development dependencies:
+
+```shell
+git clone https://github.com/whyscream/django-windowsauthtoken
+cd django-windowsauthtoken
+uv sync --dev
+```
+
+You can run the tests using pytest:
+
+```shell
+pytest
+```
+
+When making changes, ensure that you add tests for any new functionality and run the existing tests to verify that everything works as expected.
+
+Code formatting and linting is done using `ruff` and `pre-commit`. You can check the formatting by running:
+
+```shell
+pre-commit run --all-files
+```
+
+## License
+
+This project is licensed under the BSD-3-Clause License. See the [LICENSE](LICENSE) file for details.

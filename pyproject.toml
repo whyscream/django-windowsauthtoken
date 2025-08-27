@@ -40,6 +40,8 @@ line-length = 120
 [tool.ruff.lint]
 select = [
     "I", # isort
+    "F", # pyflakes
+    "C", # mccabe
 ]
 
 [tool.coverage.run]

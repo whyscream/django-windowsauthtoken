@@ -6,7 +6,6 @@ import pytest
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
 
-from django_windowsauthtoken.formatters import FormattingError
 from django_windowsauthtoken.middleware import WindowsAuthTokenMiddleware
 
 

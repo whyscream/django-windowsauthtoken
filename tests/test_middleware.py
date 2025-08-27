@@ -1,4 +1,5 @@
 import logging
+import sys
 from collections import namedtuple
 
 import pytest
@@ -157,11 +158,28 @@ def test_middleware_init_pywin32_error_handling(mocker):
     assert "pywin32 is required for Windows Authentication Token middleware." in str(excinfo.value)
 
 
-def test_retrieve_auth_user_details_pywin32_error_handling(monkeypatch, mocker):
+def test_retrieve_auth_user_details_pywin32_error_handling(mocker):
     mocker.patch("django_windowsauthtoken.middleware._IGNORE_PYWIN32_ERRORS", False)
+    mocker.patch("django_windowsauthtoken.middleware.win32security", None)
+    mocker.patch("django_windowsauthtoken.middleware.pywintypes", None)
+    mocker.patch("django_windowsauthtoken.middleware.win32api", None)
+
     with pytest.raises(ImproperlyConfigured) as excinfo:
         WindowsAuthTokenMiddleware.retrieve_auth_user_details("123")
     assert "pywin32 is required for Windows Authentication Token middleware." in str(excinfo.value)
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Requires Windows platform")
+def test_retrieve_auth_user_details_nonexistent_token(mocker):
+    """On Windows, a made up token should result in an actual GetTokenInformation error."""
+    mocker.patch("django_windowsauthtoken.middleware._IGNORE_PYWIN32_ERRORS", False)
+
+    with pytest.raises(ValueError) as excinfo:
+        WindowsAuthTokenMiddleware.retrieve_auth_user_details("123")
+
+    assert "Can't retrieve Security ID for token" in str(excinfo.value)
+    # The error response from GetTokenInformation
+    assert "The handle is invalid." in str(excinfo.value)
 
 
 def test_format_username_default(mocker):

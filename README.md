@@ -60,7 +60,7 @@ Alternatively, if you want to use the `username@domain` format, you can set:
 WINDOWSAUTHTOKEN_USERNAME_FORMATTER = "django_windowsauthtoken.formatters.format_email_like"
 ```
 
-You can also implement your own custom formatter function. The function should take two arguments: `username` and `domain`, and return the formatted username.
+Both of the above formats are acceptable by Django. You can also implement your own custom formatter function. The function should take two arguments: `username` and `domain`, and return the formatted username.
 
 ## Development
 

@@ -1,8 +1,10 @@
+import logging
 from collections import namedtuple
 
 import pytest
 from django.core.exceptions import ImproperlyConfigured
 
+from django_windowsauthtoken.formatters import FormattingError
 from django_windowsauthtoken.middleware import WindowsAuthTokenMiddleware
 
 
@@ -159,3 +161,45 @@ def test_retrieve_auth_user_details_pywin32_error_handling(monkeypatch, mocker):
     with pytest.raises(ImproperlyConfigured) as excinfo:
         WindowsAuthTokenMiddleware.retrieve_auth_user_details("123")
     assert "pywin32 is required for Windows Authentication Token middleware." in str(excinfo.value)
+
+
+def test_format_username_default(mocker):
+    mock_get_response = mocker.Mock()
+    middleware = WindowsAuthTokenMiddleware(mock_get_response)
+    formatted_username = middleware.format_username("testuser", "TESTDOMAIN")
+    assert formatted_username == r"TESTDOMAIN\testuser"
+
+
+def custom_formatter(user: str, domain: str) -> str:
+    return f"{user}@{domain}.com"
+
+
+def test_format_username_custom(mocker, settings):
+    settings.WINDOWSAUTHTOKEN_USERNAME_FORMATTER = "tests.test_middleware.custom_formatter"
+
+    mock_get_response = mocker.Mock()
+    middleware = WindowsAuthTokenMiddleware(mock_get_response)
+    formatted_username = middleware.format_username("testuser", "TESTDOMAIN")
+    assert formatted_username == "testuser@TESTDOMAIN.com"
+
+
+def test_username_formatter_raises(mocker, caplog):
+    mocker.patch(
+        "django_windowsauthtoken.middleware.WindowsAuthTokenMiddleware.retrieve_auth_user_details",
+        return_value=("testuser", ""),
+    )
+    caplog.set_level(logging.WARNING, logger="windowsauthtoken")
+
+    mock_get_response = mocker.Mock()
+    middleware = WindowsAuthTokenMiddleware(mock_get_response)
+
+    request = mocker.Mock()
+    request.headers = {"X-IIS-WindowsAuthToken": "valid_token"}
+    request.META = {}
+
+    middleware(request)
+
+    assert "REMOTE_USER" not in request.META
+    mock_get_response.assert_called_once_with(request)
+
+    assert "Domain and user cannot be empty." in caplog.text

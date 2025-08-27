@@ -1,8 +1,8 @@
 # Windows Authentication Token handling for Django
 
-When IIS on Windows is used as a webserver frontend for Django, authentication can be handled by the webserver using Windows Authentication. Microsoft recommends using the HttpPlatformHandler method to integrate Python webapps with IIS. Unlike when using the older and unmaintained `wfastcgi`, the HttpPlatformHandler doesn't set the `REMOTE_USER` variable after authentication. Instead, the authenticated user's token is available as a header named `X-IIS-WindowsAuthToken`.
+When IIS on Windows is used as a webserver frontend for Django, authentication can be handled by the webserver using Windows Authentication. Microsoft recommends using the HttpPlatformHandler method to integrate Python webapps with IIS. Unlike the FastCGI handler which requires the old and unmaintained `wfastcgi` Python dependency, the HttpPlatformHandler doesn't set the `REMOTE_USER` variable after authentication. Instead, the authenticated user receives a Windows Authentication Token, which is available as a header named `X-IIS-WindowsAuthToken`.
 
-This package provides a Django middleware that extracts the token from the header, requests the actual username from Windows, and sets the `REMOTE_USER` variable accordingly. This allows you to use Django's built-in authentication mechanisms seamlessly.
+This package provides a Django middleware that extracts this token from the request, retrieves the actual username from Windows, and sets the `REMOTE_USER` variable accordingly. This allows you to use Django's built-in authentication mechanisms seamlessly.
 
 ## Installation
 
@@ -11,6 +11,7 @@ You can install the package using pip:
 ```bash
 pip install django-windowsauthtoken
 ```
+On Windows, this will also install the `pywin32` package, which is required to interact with Windows APIs. Note that `pywin32` is only available on Windows, so this package will not work on other operating systems.
 
 After installation, add the middleware to your Django settings:
 
@@ -19,14 +20,32 @@ MIDDLEWARE = [
     ...,
     "django_windowsauthtoken.middleware.WindowsAuthTokenMiddleware",
     # Ensure this is placed before any authentication middleware
-    # You'll likely want to use Django's built-in RemoteUserMiddleware
+    # You'll likely want to use Django's RemoteUserMiddleware too, to process the REMOTE_USER variable
     "django.contrib.auth.middleware.RemoteUserMiddleware",
     ...
 ]
 ```
 
-Now configure IIS to integrate with your Django application using the HttpPlatformHandler, and ensure that Windows Authentication is enabled for your site.
+Now configure IIS to integrate with your Django application [using the HttpPlatformHandler](https://learn.microsoft.com/en-us/visualstudio/python/configure-web-apps-for-iis-windows?view=vs-2022#option-1-configure-the-httpplatformhandler), and ensure that [Windows Authentication is enabled](https://learn.microsoft.com/en-us/iis/configuration/system.webServer/security/authentication/windowsAuthentication/) for your site.
 
 ## Usage
 
 Once the middleware is added, it will automatically handle the extraction of the Windows Authentication token from the `X-IIS-WindowsAuthToken` header and set the `REMOTE_USER` variable. You can then use Django's authentication system as usual.
+
+## Username format
+
+By default, the middleware will set the `REMOTE_USER` variable to the username in the format `DOMAIN\username`. While this is true to the Windows Authentication standard, it may not be the format you want to use in your Django application, especially if you are using Django's default user model which does not allow backslashes in usernames.
+
+If you prefer to use just the `username` without the domain, you can configure this by setting the following in your Django settings:
+
+```python
+WINDOWSAUTHTOKEN_USERNAME_FORMATTER = "django_windowsauthtoken.formatters.format_username_only"
+```
+
+Alternatively, if you want to use the `username@domain` format, you can set:
+
+```python
+WINDOWSAUTHTOKEN_USERNAME_FORMATTER = "django_windowsauthtoken.formatters.format_email_like"
+```
+
+You can also implement your own custom formatter function. The function should take two arguments: `username` and `domain`, and return the formatted username.

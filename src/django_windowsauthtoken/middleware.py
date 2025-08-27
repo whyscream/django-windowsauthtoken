@@ -1,7 +1,11 @@
 import logging
 import os
 
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.module_loading import import_string
+
+from .formatters import DEFAULT_FORMATTER, FormattingError
 
 logger = logging.getLogger("windowsauthtoken")
 
@@ -27,6 +31,7 @@ class WindowsAuthTokenMiddleware:
 
     def __init__(self, get_response):
         self.get_response = get_response
+        self.username_formatter: str = getattr(settings, "WINDOWSAUTHTOKEN_USERNAME_FORMATTER", DEFAULT_FORMATTER)
 
         if not any([win32security, pywintypes, win32api]) and not _IGNORE_PYWIN32_ERRORS:
             raise ImproperlyConfigured("pywin32 is required for Windows Authentication Token middleware.'")
@@ -36,16 +41,27 @@ class WindowsAuthTokenMiddleware:
         if auth_token:
             try:
                 username, domain = self.retrieve_auth_user_details(auth_token)
-            except ValueError:
-                logger.warning("Could not retrieve username from auth token.")
+            except ValueError as err:
+                logger.warning(f"Cannot retrieve username from auth token: {err}")
                 username = None
                 domain = None
+        else:
+            username = None
+            domain = None
 
-            if username and domain:
-                # Set the REMOTE_USER environment variable
-                domain_user = rf"{domain}\{username}"
-                request.META["REMOTE_USER"] = domain_user
-                logger.debug(f"Set REMOTE_USER to {domain_user}")
+        if username is not None and domain is not None:
+            try:
+                formatted_user = self.format_username(username, domain)
+            except FormattingError as err:
+                logger.warning(f"Username formatter raised an error: {err} {username=} {domain=}")
+                formatted_user = None
+        else:
+            formatted_user = None
+
+        if formatted_user is not None:
+            # Set the REMOTE_USER environment variable
+            request.META["REMOTE_USER"] = formatted_user
+            logger.debug(f"Set REMOTE_USER to {formatted_user}")
 
         return self.get_response(request)
 
@@ -89,3 +105,18 @@ class WindowsAuthTokenMiddleware:
             raise ValueError(f"Can't retrieve account details for SID: {err}")
 
         return user, domain
+
+    def format_username(self, user: str, domain: str) -> str:
+        """
+        Format the username using the configured formatter.
+
+        Args:
+            user (str): The username.
+            domain (str): The domain.
+        Returns:
+            str: The formatted username.
+        Raises:
+            FormattingError: If the formatter raises an error.
+        """
+        formatter = import_string(self.username_formatter)
+        return formatter(user, domain)

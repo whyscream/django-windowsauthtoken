@@ -58,6 +58,9 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.RemoteUserBackend",
 ]
 
+# Format the username as sole username, without domain. This works with Django user model
+WINDOWSAUTHTOKEN_USERNAME_FORMATTER = "django_windowsauthtoken.formatters.format_username_only"
+
 ROOT_URLCONF = "sample_project.urls"
 
 TEMPLATES = [

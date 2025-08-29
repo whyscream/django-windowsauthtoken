@@ -193,7 +193,7 @@ def custom_formatter(user: str, domain: str) -> str:
 
 
 def test_format_username_custom(mocker, settings):
-    settings.WINDOWSAUTHTOKEN_USERNAME_FORMATTER = "tests.test_middleware.custom_formatter"
+    settings.WINDOWSAUTHTOKEN_USERNAME_FORMATTER = "test_middleware.custom_formatter"
 
     mock_get_response = mocker.Mock()
     middleware = WindowsAuthTokenMiddleware(mock_get_response)

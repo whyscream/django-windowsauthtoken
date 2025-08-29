@@ -16,6 +16,6 @@ def pytest_configure():
             "django.contrib.sessions",
             "django.contrib.admin",
         ],
-        ROOT_URLCONF="tests.urlconf",
+        ROOT_URLCONF="urlconf",
         SECRET_KEY="django-insecure-test-key",
     )

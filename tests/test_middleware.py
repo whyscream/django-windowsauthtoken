@@ -38,7 +38,12 @@ def test_middleware_sets_remote_user(mocker, rf):
     response = middleware(request)
 
     assert response == mock_get_response.return_value
+
     assert request.META["REMOTE_USER"] == r"TESTDOMAIN\testuser"
+    assert request.META["HTTP_REMOTE_USER"] == r"TESTDOMAIN\testuser"
+    assert request.META["WINDOWSAUTHTOKEN_USER"] == "testuser"
+    assert request.META["WINDOWSAUTHTOKEN_DOMAIN"] == "TESTDOMAIN"
+
     mock_get_response.assert_called_once_with(request)
 
 

@@ -69,6 +69,9 @@ class WindowsAuthTokenMiddleware:
             # In async contexts, there is no environment variable, so we set it in META as a HTTP header,
             # just like the RemoteUserMiddleware expects it for async requests.
             request.META["HTTP_REMOTE_USER"] = formatted_user
+            # Save the original auth results for reference
+            request.META["WINDOWSAUTHTOKEN_USER"] = username
+            request.META["WINDOWSAUTHTOKEN_DOMAIN"] = domain
 
             logger.debug(f"Set REMOTE_USER to {formatted_user}")
 

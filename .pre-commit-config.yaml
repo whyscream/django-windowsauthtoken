@@ -23,3 +23,5 @@ repos:
     rev: "1.25.0"
     hooks:
       - id: django-upgrade
+        # 'request_headers' rule doesn't like reading HTTP_REMOTE_USER from request.META
+        args: ["--skip", "request_headers"]

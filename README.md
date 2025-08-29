@@ -38,6 +38,8 @@ AUTHENTICATION_BACKENDS = [
 
 Now configure IIS to integrate with your Django application [using the HttpPlatformHandler](https://learn.microsoft.com/en-us/visualstudio/python/configure-web-apps-for-iis-windows?view=vs-2022#option-1-configure-the-httpplatformhandler), and ensure that [Windows Authentication is enabled](https://learn.microsoft.com/en-us/iis/configuration/system.webServer/security/authentication/windowsAuthentication/) for your site.
 
+TODO: Add detailed instructions for setting up IIS.
+
 ## Usage
 
 Once the middleware is added, it will automatically handle the extraction of the Windows Authentication token from the `X-IIS-WindowsAuthToken` header and set the `REMOTE_USER` variable. You can then use Django's authentication system as usual.
@@ -61,6 +63,22 @@ WINDOWSAUTHTOKEN_USERNAME_FORMATTER = "django_windowsauthtoken.formatters.format
 ```
 
 Both of the above formats are acceptable by Django. You can also implement your own custom formatter function. The function should take two arguments: `username` and `domain`, and return the formatted username.
+
+### Debugging
+
+When setting up IIS or the middleware is not working as expected, there is a debug view that shows all relevant information from the request. To enable it, add the following to your `urls.py`:
+
+```python
+from django.urls import path
+from django_windowsauthtoken.views import debug_view
+
+urlpatterns = [
+    ...,
+    path("windowsauthtoken-debug/", debug_view, name="windowsauthtoken-debug"),
+    ...,
+]
+```
+You will also need to enable `DEBUG` in your Django settings. Then navigate to `/windowsauthtoken-debug/` in your browser. This view will display the headers and other relevant information from the request, which can help you diagnose issues with the middleware or IIS configuration.
 
 ## Development
 

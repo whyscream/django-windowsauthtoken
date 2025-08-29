@@ -16,40 +16,11 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.http import HttpResponse
-from django.template import Context, Template
 from django.urls import path
 
-
-def windowsauthtoken_debug(request):
-    """
-    A simple view to display the WindowsAuthToken debug information.
-
-    A template string is used here for simplicity.
-    It's rendered directly without needing a separate HTML file.
-    """
-    template_string = """
-    <h1>WindowsAuthToken Debug Information</h1>
-    <h2>User Information:</h2>
-    <p>Username: {{ request.user.username|default:'-' }}</p>
-    <p>Is Authenticated: {{ request.user.is_authenticated }}</p>
-    <p>Is Anonymous: {{ request.user.is_anonymous }}</p>
-
-    <h2>Request Information:</h2>
-    <p>Is X-IIS-WindowsAuthToken header set: {% if request.META.HTTP_X_IIS_WINDOWSAUTHTOKEN %}yes ({{ request.META.HTTP_X_IIS_WINDOWSAUTHTOKEN }}){% else %}no{% endif %} </p>
-    <p>Is Remote User set: {% if request.META.REMOTE_USER %}yes ({{ request.META.REMOTE_USER }}){% else %}no{% endif %}</p>
-    <p>ASGI/WSGI request: {{ request }}</p>
-
-    <h2>Request headers:</h2>
-    <p{% for k, v in request.headers.items %}{{ k }}: {{ v }}<br/>{% endfor %}</p>
-
-    <h2>Request META Information:</h2>
-    <p>{% for k, v in request.META.items %}{{ k }}: {{ v }}<br/>{% endfor %}</p>
-    """
-    return HttpResponse(Template(template_string).render(Context({"request": request})), content_type="text/html")
-
+from django_windowsauthtoken.views import debug_view
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("windowsauthtoken-debug/", windowsauthtoken_debug),
+    path("windowsauthtoken-debug/", debug_view, name="windowsauthtoken-debug"),
 ]

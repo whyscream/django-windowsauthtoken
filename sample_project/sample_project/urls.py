@@ -46,5 +46,5 @@ def windowsauthtoken_debug(request):
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("windowsauthtoken-debug", windowsauthtoken_debug),
+    path("windowsauthtoken-debug/", windowsauthtoken_debug),
 ]

@@ -30,7 +30,6 @@ class WindowsAuthTokenMiddleware:
     """
 
     sync_capable = True
-    async_capable = True
 
     header_name = "X-IIS-WindowsAuthToken"
     """The HTTP header name where the Windows Authentication Token is expected."""

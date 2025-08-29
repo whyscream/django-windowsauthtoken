@@ -31,9 +31,14 @@ def windowsauthtoken_debug(request):
     template_string = """
     <h1>WindowsAuthToken Debug Information</h1>
     <h2>User Information:</h2>
-    <p>Username: {{ request.user.username }}</p>
+    <p>Username: {{ request.user.username|default:'-' }}</p>
     <p>Is Authenticated: {{ request.user.is_authenticated }}</p>
     <p>Is Anonymous: {{ request.user.is_anonymous }}</p>
+
+    <h2>Request Information:</h2>
+    <p>Is X-IIS-WindowsAuthToken header set: {% if request.META.HTTP_X_IIS_WINDOWSAUTHTOKEN %}yes ({{ request.META.HTTP_X_IIS_WINDOWSAUTHTOKEN }}){% else %}no{% endif %} </p>
+    <p>Is Remote User set: {% if request.META.REMOTE_USER %}yes ({{ request.META.REMOTE_USER }}){% else %}no{% endif %}</p>
+    <p>ASGI/WSGI request: {{ request }}</p>
 
     <h2>Request headers:</h2>
     <p{% for k, v in request.headers.items %}{{ k }}: {{ v }}<br/>{% endfor %}</p>

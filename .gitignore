@@ -11,4 +11,6 @@ src/*.egg-info
 
 # Test and coverage files
 .coverage
-db.sqlite3
+sample_project/db.sqlite3
+sample_project/static/
+sample_project/web.config

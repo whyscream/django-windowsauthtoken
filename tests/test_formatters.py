@@ -4,31 +4,31 @@ from django.core.exceptions import ValidationError
 
 from django_windowsauthtoken.formatters import (
     FormattingError,
+    format_domain_user,
     format_email_like,
-    format_username_domain_user,
     format_username_only,
 )
 
 User = get_user_model()
 
 
-def test_format_username_domain_user():
-    assert format_username_domain_user("testuser", "TESTDOMAIN") == r"TESTDOMAIN\testuser"
+def test_format_domain_user():
+    assert format_domain_user("testuser", "TESTDOMAIN") == r"TESTDOMAIN\testuser"
 
 
-def test_format_username_domain_user_empty_domain():
+def test_format_domain_user_empty_domain():
     with pytest.raises(FormattingError):
-        format_username_domain_user("testuser", "")
+        format_domain_user("testuser", "")
 
 
-def test_format_username_domain_user_empty_user():
+def test_format_domain_user_empty_user():
     with pytest.raises(FormattingError):
-        format_username_domain_user("", "TESTDOMAIN")
+        format_domain_user("", "TESTDOMAIN")
 
 
-def test_format_username_domain_user_both_empty():
+def test_format_domain_user_both_empty():
     with pytest.raises(FormattingError):
-        format_username_domain_user("", "")
+        format_domain_user("", "")
 
 
 def testformat_username_only():
@@ -69,8 +69,8 @@ def test_format_email_like_both_empty():
 
 
 @pytest.mark.django_db
-def test_format_username_domain_user_incompatible_with_django_user_model():
-    formatted_username = format_username_domain_user("testuser", "TESTDOMAIN")
+def test_format_domain_user_incompatible_with_django_user_model():
+    formatted_username = format_domain_user("testuser", "TESTDOMAIN")
     user = User.objects.create_user(username=formatted_username)
     with pytest.raises(ValidationError) as excinfo:
         user.full_clean()

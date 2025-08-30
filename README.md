@@ -137,6 +137,11 @@ git push origin v1.2.3
 ```
 The action will automatically build and upload the package to PyPI.
 
+## Thanks
+
+Thanks to [Lextudio](https://lextudio.com) for their excellent blog posts on using HttpPlatformHandler with Windows Authentication, which inspired this project:
+- https://docs.lextudio.com/blog/httpplatformhandler-windows-authentication-tips/
+- https://docs.lextudio.com/blog/running-django-web-apps-on-iis-with-httpplatformhandler/
 
 ## License
 

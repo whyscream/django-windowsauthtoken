@@ -64,7 +64,8 @@ jobs:
 
       - name: Test install release distributions
         run: |
-          python -m pip install --force-reinstall dist/*
+          python -m pip install --force-reinstall dist/*.tar.gz
+          python -m pip install --force-reinstall dist/*.whl
 
       - name: Verify installation
         run: |

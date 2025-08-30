@@ -4,7 +4,7 @@ class FormattingError(Exception):
     pass
 
 
-def format_username_domain_user(user: str, domain: str) -> str:
+def format_domain_user(user: str, domain: str) -> str:
     r"""Format the username as DOMAIN\user."""
     if not domain or not user:
         raise FormattingError("Domain and user cannot be empty.")
@@ -25,4 +25,4 @@ def format_email_like(user: str, domain: str) -> str:
     return f"{user}@{domain}"
 
 
-DEFAULT_FORMATTER = f"{__name__}.format_username_domain_user"
+DEFAULT_FORMATTER = f"{__name__}.format_domain_user"

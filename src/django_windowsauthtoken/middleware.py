@@ -107,7 +107,12 @@ class WindowsAuthTokenMiddleware:
         except pywintypes.error as err:
             raise ValueError(f"Can't retrieve Security ID for token: {err}")
         finally:
-            win32api.CloseHandle(token_handle)
+            # Always try to close the token handle, but ignore any issues with it
+            try:
+                win32api.CloseHandle(token_handle)
+            except pywintypes.error as err:
+                logger.debug(f"Failed to close token handle: {err}")
+                pass
 
         try:
             user, domain, account_type = win32security.LookupAccountSid(None, security_id)

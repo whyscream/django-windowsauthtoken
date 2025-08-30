@@ -92,7 +92,7 @@ uv sync --dev
 
 ### Note on pywin32
 
-When developing on a non-Windows system, you can work around the absence of `pywin32` by settings the following environment variable:
+When developing on a non-Windows system, you can work around the absence of `pywin32` by setting the following environment variable:
 
 ```shell
 WINDOWSAUTHTOKEN_IGNORE_PYWIN32_ERRORS=true
@@ -108,11 +108,11 @@ You can run the tests using pytest:
 pytest
 ```
 
-### Coding standards
-
 When making changes, ensure that you add tests for any new functionality and run the existing tests to verify that everything works as expected.
 
-Code formatting and linting is done using `ruff` and `pre-commit`. You can check the formatting by running:
+### Coding standards
+
+Code formatting and linting is done using `ruff` and `pre-commit`. See the pre-commit docs on how to set it up. You can check the formatting manually by running:
 
 ```shell
 pre-commit run --all-files

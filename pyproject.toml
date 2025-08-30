@@ -2,6 +2,7 @@
 name = "django-windowsauthtoken"
 version = "0.1.0"
 description = "Windows Authentication Token handling for Django"
+license = "BSD-3-Clause"
 readme = "README.md"
 authors = [
     { name = "Tom Hendrikx", email = "tom@whyscream.net" }
@@ -9,7 +10,6 @@ authors = [
 classifiers = [
     "Programming Language :: Python :: 3.13",
     "Framework :: Django",
-    "License :: OSI Approved :: BSD-3-Clause",
     "Intended Audience :: Developers",
     "Operating System :: Windows",
 ]

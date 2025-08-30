@@ -90,11 +90,25 @@ cd django-windowsauthtoken
 uv sync --dev
 ```
 
+### Note on pywin32
+
+When developing on a non-Windows system, you can work around the absence of `pywin32` by settings the following environment variable:
+
+```shell
+WINDOWSAUTHTOKEN_IGNORE_PYWIN32_ERRORS=true
+```
+
+This will allow you to run the tests and work on the code without `pywin32`, but note that the middleware will not function correctly without it.
+
+### Running Tests
+
 You can run the tests using pytest:
 
 ```shell
 pytest
 ```
+
+### Coding standards
 
 When making changes, ensure that you add tests for any new functionality and run the existing tests to verify that everything works as expected.
 

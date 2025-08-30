@@ -111,7 +111,7 @@ class WindowsAuthTokenMiddleware:
             try:
                 win32api.CloseHandle(token_handle)
             except pywintypes.error as err:
-                logger.debug(f"Failed to close token handle: {err}")
+                logger.warning(f"Failed to close token handle: {err}")
                 pass
 
         try:

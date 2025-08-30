@@ -47,7 +47,7 @@ TODO: Add detailed instructions for setting up IIS.
 
 Once the middleware is added, it will automatically handle the extraction of the Windows Authentication token from the `X-IIS-WindowsAuthToken` header and set the `REMOTE_USER` variable. You can then use Django's authentication system as usual.
 
-The RemoteUserMiddleware will use the `REMOTE_USER` variable to authenticate users against Django's user model. If a user with the given username does not exist, it will by default create a new user. See the Django documentation for more details on [how RemoteUserMiddleware works](https://docs.djangoproject.com/en/stable/topics/auth/default/#django.contrib.auth.middleware.RemoteUserMiddleware).
+The RemoteUserMiddleware will use the `REMOTE_USER` variable to authenticate users against Django's user model. If a user with the given username does not exist, it will by default create a new user and sign in as that user. See the Django documentation for more details on [how RemoteUserMiddleware works](https://docs.djangoproject.com/en/stable/howto/auth-remote-user/).
 
 ## Username format
 
@@ -82,6 +82,12 @@ urlpatterns = [
 ]
 ```
 You will also need to enable `DEBUG` in your Django settings. Then navigate to `/windowsauthtoken-debug/` in your browser. This view will display the headers and other relevant information from the request, which can help you diagnose issues with the middleware or IIS configuration.
+
+### Versioning
+
+This project uses [Semantic Versioning](https://semver.org/) for versioning. Versions are in the format `MAJOR.MINOR.PATCH`, with optional pre-release and build metadata.
+
+Versions are tagged as full releases (`v1.2.3`), development releases (`v1.2.3.dev4`) or release candidates (`v1.2.3rc4`).
 
 ## Development
 
@@ -120,6 +126,17 @@ Code formatting and linting is done using `ruff` and `pre-commit`. See the pre-c
 ```shell
 pre-commit run --all-files
 ```
+
+### Publishing to PyPI
+
+There is a GitHub Action set up to publish new releases to PyPI. To publish a new version, simply create a tag in the repository using a git client or through the github website:
+
+```shell
+git tag v1.2.3```
+git push origin v1.2.3
+```
+The action will automatically build and upload the package to PyPI.
+
 
 ## License
 

@@ -11,8 +11,9 @@ name: Upload Python Package
 on:
   push:
     tags:
-    #  - 'v*.*.*'  # Trigger on version tags like v1.2.3
-      - 'v*'       # Trigger on any tag, for testing with e.g. v0.1-alpha
+      - 'v*.*.*'  # Trigger on version tags like v1.2.3
+      - 'v*.*.*.dev*'  # Trigger on version tags like v1.2.3.dev4
+      - 'v*.*.*rc*'  # Trigger on version tags like v1.2.3.rc1
 
 permissions:
   contents: read

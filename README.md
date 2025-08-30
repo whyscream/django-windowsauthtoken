@@ -1,7 +1,7 @@
 # Windows Authentication Token handling for Django
 
-![PyPI - Version](https://img.shields.io/pypi/v/django-windowsauthtoken?link=https%3A%2F%2Fpypi.org%2Fproject%2Fdjango-windowsauthtoken&logo=pypi)
-![GitHub branch check runs](https://img.shields.io/github/check-runs/whyscream/django-windowsauthtoken/main?logo=github&link=https%3A%2F%2Fgithub.com%2Fwhyscream%2Fdjango-windowsauthtoken%2F)
+[![PyPI - Version](https://img.shields.io/pypi/v/django-windowsauthtoken?logo=pypi)](https://pypi.org/project/django-windowsauthtoken/)
+[![GitHub branch check runs](https://img.shields.io/github/check-runs/whyscream/django-windowsauthtoken/main?logo=github)](https://github.com/whyscream/django-windowsauthtoken)
 
 When IIS on Windows is used as a webserver frontend for Django, authentication can be handled by the webserver using Windows Authentication. Microsoft recommends using the HttpPlatformHandler method to integrate Python webapps with IIS. Unlike the FastCGI handler which requires the old and unmaintained `wfastcgi` Python dependency, the HttpPlatformHandler doesn't set the `REMOTE_USER` variable after authentication. Instead, the authenticated user receives a Windows Authentication Token, which is available as a header named `X-IIS-WindowsAuthToken`.
 

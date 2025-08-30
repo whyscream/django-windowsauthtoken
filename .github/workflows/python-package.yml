@@ -39,8 +39,8 @@ jobs:
         version: "0.8.13"
     - name: Install dependencies
       run: |
-        uv sync --quiet --locked --dev --no-install-package django
-        uv pip --quiet install "django==${{ matrix.django-version }}"
+        uv sync --locked --dev --no-install-package django
+        uv pip install "django==${{ matrix.django-version }}"
         uv pip freeze
     - name: Lint with pre-commit
       run: |

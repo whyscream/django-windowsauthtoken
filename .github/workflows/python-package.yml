@@ -47,4 +47,4 @@ jobs:
         uv run pre-commit run --all-files --show-diff-on-failure
     - name: Test with pytest
       run: |
-        uv run pytest --cov-report xml:coverage.xml
+        uv run pytest --cov-report xml:coverage.xml --cov-fail-under=80

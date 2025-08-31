@@ -1,8 +1,10 @@
 import logging
 import os
+from typing import Callable
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.http import HttpRequest, HttpResponse
 from django.utils.module_loading import import_string
 
 from .formatters import DEFAULT_FORMATTER, FormattingError
@@ -34,14 +36,14 @@ class WindowsAuthTokenMiddleware:
     header_name = "X-IIS-WindowsAuthToken"
     """The HTTP header name where the Windows Authentication Token is expected."""
 
-    def __init__(self, get_response):
+    def __init__(self, get_response: Callable[[HttpRequest], HttpResponse]) -> None:
         self.get_response = get_response
         self.username_formatter: str = getattr(settings, "WINDOWSAUTHTOKEN_USERNAME_FORMATTER", DEFAULT_FORMATTER)
 
         if not any([win32security, pywintypes, win32api]) and not _IGNORE_PYWIN32_ERRORS:
             raise ImproperlyConfigured("pywin32 is required for Windows Authentication Token middleware.'")
 
-    def __call__(self, request):
+    def __call__(self, request: HttpRequest) -> HttpResponse:
         auth_token = request.headers.get(self.header_name, "")
         if auth_token:
             try:
@@ -135,5 +137,5 @@ class WindowsAuthTokenMiddleware:
         Raises:
             FormattingError: If the formatter raises an error.
         """
-        formatter = import_string(self.username_formatter)
+        formatter: Callable[[str, str], str] = import_string(self.username_formatter)
         return formatter(user, domain)

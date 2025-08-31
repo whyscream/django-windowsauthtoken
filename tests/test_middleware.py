@@ -270,4 +270,4 @@ async def test_combine_with_remote_user_middleware_async(mocker, settings, async
     assert await User.objects.acount() == 1, "User should be created by RemoteUserMiddleware"
     user = await User.objects.afirst()
     assert user == response.asgi_request.user
-    assert user.username == r"TESTDOMAIN\testuser"
+    assert user.get_username() == r"TESTDOMAIN\testuser"

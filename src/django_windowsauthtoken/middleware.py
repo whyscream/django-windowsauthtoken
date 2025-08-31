@@ -18,8 +18,8 @@ try:  # pragma: no cover
     import pywintypes
     import win32api
     import win32security
-except ImportError:
-    if _IGNORE_PYWIN32_ERRORS:  # pragma: no cover
+except ImportError:  # pragma: no cover
+    if _IGNORE_PYWIN32_ERRORS:
         logger.warning("pywin32 is not installed, but errors are being ignored.")
     pywintypes = None  # type: ignore[assignment]
     win32api = None  # type: ignore[assignment]

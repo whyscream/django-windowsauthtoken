@@ -111,8 +111,8 @@ class WindowsAuthTokenMiddleware:
             try:
                 win32api.CloseHandle(token_handle)
             except pywintypes.error as err:
+                # just log and continue
                 logger.warning(f"Failed to close token handle: {err}")
-                pass
 
         try:
             user, domain, account_type = win32security.LookupAccountSid(None, security_id)

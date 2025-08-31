@@ -1,7 +1,9 @@
 from django.conf import settings
 from django.http import JsonResponse
+from django.views.decorators.http import require_GET
 
 
+@require_GET
 def debug_view(request):
     """
     A simple debug view that returns the current user's username and domain.

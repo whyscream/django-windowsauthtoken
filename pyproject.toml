@@ -57,6 +57,7 @@ select = [
 
 [tool.coverage.run]
 branch = true
+relative_files = true
 source = ["django_windowsauthtoken"]
 
 [tool.pytest.ini_options]

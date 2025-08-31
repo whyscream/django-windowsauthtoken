@@ -10,10 +10,34 @@ on:
     branches: [ "main" ]
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.13
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+      with:
+        version: "0.8.14"
+
+    - name: Install dependencies
+      run: |
+        uv sync --locked --dev
+        uv pip freeze
+
+    - name: Lint with pre-commit
+      run: |
+        uv run pre-commit run --all-files --show-diff-on-failure
+
   test:
     runs-on: ${{ matrix.os }}
+    needs: lint
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         os: ["ubuntu-latest", "windows-latest"]
         python-version: ["3.9", "3.13", "3.14.0-rc.2"]
@@ -44,10 +68,6 @@ jobs:
         uv sync --locked --dev --no-install-package django
         uv pip install "django==${{ matrix.django-version }}"
         uv pip freeze
-
-    - name: Lint with pre-commit
-      run: |
-        uv run pre-commit run --all-files --show-diff-on-failure
 
     - name: Test with pytest
       run: |

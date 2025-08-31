@@ -11,7 +11,7 @@ def format_domain_user(user: str, domain: str) -> str:
     return rf"{domain}\{user}"
 
 
-def format_username_only(user: str, domain: str) -> str:
+def format_username_only(user: str, _: str) -> str:
     """Format the username as user only."""
     if not user:
         raise FormattingError("User cannot be empty.")

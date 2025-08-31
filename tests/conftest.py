@@ -16,6 +16,15 @@ def pytest_configure():
             "django.contrib.sessions",
             "django.contrib.admin",
         ],
+        MIDDLEWARE=[
+            "django.contrib.sessions.middleware.SessionMiddleware",
+            "django.contrib.auth.middleware.AuthenticationMiddleware",
+            "django_windowsauthtoken.middleware.WindowsAuthTokenMiddleware",
+            "django.contrib.auth.middleware.RemoteUserMiddleware",
+        ],
+        AUTHENTICATION_BACKENDS=[
+            "django.contrib.auth.backends.RemoteUserBackend",
+        ],
         ROOT_URLCONF="urlconf",
         SECRET_KEY="django-insecure-test-key",
     )

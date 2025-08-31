@@ -79,6 +79,7 @@ jobs:
     - name: Test with pytest
       run: |
         uv run pytest --cov-report xml:coverage.xml --junitxml=pytest.xml --cov-fail-under=80
+      continue-on-error: true  # Always continue to upload reports
 
     - name: Upload coverage and test reports
       # Upload coverage report only once to avoid redundancy

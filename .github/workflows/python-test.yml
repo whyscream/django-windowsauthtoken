@@ -25,11 +25,13 @@ jobs:
         version: "0.8.14"
 
     - name: Install dependencies
+      # TODO: Is this necessary? Maybe we just install pre-commit directly?
       run: |
         uv sync --locked --dev
         uv pip freeze
 
     - name: Lint with pre-commit
+      # TODO: Consider caching pre-commit installation
       run: |
         uv run pre-commit run --all-files --show-diff-on-failure
 
@@ -64,6 +66,7 @@ jobs:
         version: "0.8.14"
 
     - name: Install dependencies
+      # TODO: set up caching for uv
       run: |
         uv sync --locked --dev --no-install-package django
         uv pip install "django==${{ matrix.django-version }}"

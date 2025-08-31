@@ -100,6 +100,19 @@ jobs:
         # No shallow clone for a better analysis
         fetch-depth: 0
 
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.13
+    - name: Install Mypy
+      run: |
+        python -m pip install mypy django-stubs types-pywin32
+
+    - name: Run MyPy
+      run: |
+        mypy --strict --junit-xml mypy.xml src
+      continue-on-error: true
+
     - name: Download coverage report
       uses: actions/download-artifact@v4
       with:

@@ -110,7 +110,7 @@ class WindowsAuthTokenMiddleware:
             # Always try to close the token handle, but ignore any issues with it
             try:
                 win32api.CloseHandle(token_handle)
-            except pywintypes.error as err:
+            except pywintypes.error as err:  # pragma: no cover
                 # just log and continue
                 logger.warning(f"Failed to close token handle: {err}")
 

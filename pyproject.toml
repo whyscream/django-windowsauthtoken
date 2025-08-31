@@ -62,3 +62,6 @@ source = ["django_windowsauthtoken"]
 
 [tool.pytest.ini_options]
 addopts = "--cov --cov-report=term-missing"
+
+[tool.mypy]
+strict = true

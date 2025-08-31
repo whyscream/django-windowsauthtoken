@@ -1,10 +1,10 @@
 from django.conf import settings
-from django.http import JsonResponse
+from django.http import HttpRequest, JsonResponse
 from django.views.decorators.http import require_GET
 
 
 @require_GET
-def debug_view(request):
+def debug_view(request: HttpRequest) -> JsonResponse:
     """
     A simple debug view that returns the current user's username and domain.
     """
@@ -22,7 +22,7 @@ def debug_view(request):
             # State of the user object
             "user.is_authenticated": request.user.is_authenticated,
             "user.is_anonymous": request.user.is_anonymous,
-            "user.username": request.user.username if request.user.is_authenticated else "N/A",
+            "user.username": request.user.get_username() if request.user.is_authenticated else "N/A",
             # Full request representation for deeper debugging if needed, mainly ASGI/WSGI differences
             "request": str(request),
             # Full META dump for deeper debugging if needed

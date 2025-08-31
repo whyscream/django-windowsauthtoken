@@ -19,9 +19,9 @@ try:  # pragma: no cover
 except ImportError:
     if _IGNORE_PYWIN32_ERRORS:  # pragma: no cover
         logger.warning("pywin32 is not installed, but errors are being ignored.")
-    pywintypes = None
-    win32api = None
-    win32security = None
+    pywintypes = None  # type: ignore[assignment]
+    win32api = None  # type: ignore[assignment]
+    win32security = None  # type: ignore[assignment]
 
 
 class WindowsAuthTokenMiddleware:

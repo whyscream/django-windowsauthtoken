@@ -72,16 +72,17 @@ Both of the above formats are acceptable by Django. You can also implement your 
 When setting up IIS or the middleware is not working as expected, there is a debug view that shows all relevant information from the request. To enable it, add the following to your `urls.py`:
 
 ```python
+from django.contrib.auth.decorators import login_not_required
 from django.urls import path
 from django_windowsauthtoken.views import debug_view
 
 urlpatterns = [
     ...,
-    path("windowsauthtoken-debug/", debug_view, name="windowsauthtoken-debug"),
+    path("windowsauthtoken-debug/", login_not_required(debug_view), name="windowsauthtoken-debug"),
     ...,
 ]
 ```
-You will also need to enable `DEBUG` in your Django settings. Then navigate to `/windowsauthtoken-debug/` in your browser. This view will display the headers and other relevant information from the request, which can help you diagnose issues with the middleware or IIS configuration.
+You will also need to enable `DEBUG` in your Django settings. Then navigate to `/windowsauthtoken-debug/` in your browser. This JSON view will display the headers and other relevant information from the request, which can help you diagnose issues with the middleware or IIS configuration. The actual need for the `login_not_required` decorator depends on your configuration.
 
 ### Versioning
 

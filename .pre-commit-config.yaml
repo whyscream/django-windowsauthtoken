@@ -2,7 +2,7 @@
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -14,14 +14,18 @@ repos:
       - id: check-illegal-windows-names
       - id: debug-statements
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.7
+    rev: v0.14.10
     hooks:
       - id: ruff-check
         args: [ "--fix" ]
       - id: ruff-format
   - repo: https://github.com/adamchainz/django-upgrade
-    rev: "1.25.0"
+    rev: "1.29.1"
     hooks:
       - id: django-upgrade
         # 'request_headers' rule doesn't like reading HTTP_REMOTE_USER from request.META
         args: ["--skip", "request_headers"]
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.21.2
+    hooks:
+      - id: pyupgrade

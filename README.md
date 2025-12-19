@@ -3,15 +3,17 @@
 [![PyPI - Version](https://img.shields.io/pypi/v/django-windowsauthtoken?logo=pypi)](https://pypi.org/project/django-windowsauthtoken/)
 [![GitHub branch check runs](https://img.shields.io/github/check-runs/whyscream/django-windowsauthtoken/main?logo=github)](https://github.com/whyscream/django-windowsauthtoken)
 
+This package provides a Django middleware that provides a `REMOTE_USER` variable when authenticating in IIS using Windows Authentication.
+
 When IIS on Windows is used as a webserver frontend for Django, authentication can be handled by the webserver using Windows Authentication. Microsoft recommends using the HttpPlatformHandler method to integrate Python webapps with IIS. Unlike the FastCGI handler which requires the old and unmaintained `wfastcgi` Python dependency, the HttpPlatformHandler doesn't set the `REMOTE_USER` variable after authentication. Instead, the authenticated user receives a Windows Authentication Token, which is available as a header named `X-IIS-WindowsAuthToken`.
 
-This package provides a Django middleware that extracts this token from the request, retrieves the actual username from Windows, and sets the `REMOTE_USER` variable accordingly. This allows you to use Django's built-in authentication mechanisms seamlessly.
+This package provides a middleware that extracts this token from the request, retrieves the actual username from Windows, and sets the `REMOTE_USER` variable accordingly. This allows you to use Django's built-in remote user authentication mechanisms seamlessly.
 
 ## Installation
 
 You can install the package using pip:
 
-```bash
+```shell
 pip install django-windowsauthtoken
 ```
 On Windows, this will also install the `pywin32` package, which is required to interact with Windows APIs. Note that `pywin32` is only available on Windows, so this package will not work on other operating systems.
@@ -22,7 +24,7 @@ After installation, add the middleware to your Django settings:
 MIDDLEWARE = [
     ...,
     "django.auth.middleware.AuthenticationMiddleware",
-    # Ensure this comes before RemoteUserMiddleware
+    # Ensure WindowsAuthTokenMiddleware comes after AuthenticationMiddleware and before RemoteUserMiddleware
     "django_windowsauthtoken.middleware.WindowsAuthTokenMiddleware",
     # You'll likely want to use Django's RemoteUserMiddleware too, to process the REMOTE_USER variable
     "django.contrib.auth.middleware.RemoteUserMiddleware",
@@ -51,7 +53,7 @@ The RemoteUserMiddleware will use the `REMOTE_USER` variable to authenticate use
 
 ## Username format
 
-By default, the middleware will set the `REMOTE_USER` variable to the username in the format `DOMAIN\username`. While this is true to the Windows Authentication standard, it may not be the format you want to use in your Django application, especially if you are using Django's default user model which does not allow backslashes in usernames.
+By default, the middleware will set the `REMOTE_USER` variable to the username in the format `DOMAIN\username`. While this is true to the Windows Authentication standard, it may not be the format you want to use in your Django application, especially if you are using Django's default User model which does not allow backslashes in usernames.
 
 If you prefer to use just the `username` without the domain, you can configure this by setting the following in your Django settings:
 
@@ -65,7 +67,7 @@ Alternatively, if you want to use the `username@domain` format, you can set:
 WINDOWSAUTHTOKEN_USERNAME_FORMATTER = "django_windowsauthtoken.formatters.format_email_like"
 ```
 
-Both of the above formats are acceptable by Django. You can also implement your own custom formatter function. The function should take two arguments: `username` and `domain`, and return the formatted username.
+Both of the above formats are acceptable by the builtin Django User model. You can also implement your own custom formatter function. The function should take two arguments: `username` and `domain`, and return the formatted username.
 
 ### Debugging
 
@@ -108,7 +110,7 @@ When developing on a non-Windows system, you can work around the absence of `pyw
 WINDOWSAUTHTOKEN_IGNORE_PYWIN32_ERRORS=true
 ```
 
-This will allow you to run the tests and work on the code without `pywin32`, but note that the middleware will not function correctly without it.
+This will allow you to run the tests and work on the code without `pywin32`, but note that for the middleware to return actual usernames, the package is required.
 
 ### Running Tests
 
@@ -133,7 +135,7 @@ pre-commit run --all-files
 There is a GitHub Action set up to publish new releases to PyPI. To publish a new version, simply create a tag in the repository using a git client or through the github website:
 
 ```shell
-git tag v1.2.3```
+git tag v1.2.3
 git push origin v1.2.3
 ```
 The action will automatically build and upload the package to PyPI.

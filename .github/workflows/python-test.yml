@@ -45,11 +45,18 @@ jobs:
       matrix:
         os: ["ubuntu-latest", "windows-latest"]
         python-version: ["3.9", "3.13", "3.14"]
-        django-version: ["4.2.*", "5.2.*"]
+        django-version: ["4.2.*", "5.2.*", "6.0.*"]
         exclude:
           # Django 5.2 only supports Python 3.10 and above
           - python-version: "3.9"
             django-version: "5.2.*"
+          # Django 6.0 only supports Python 3.12 and above
+          - python-version: "3.9"
+            django-version: "6.0.*"
+          - python-version: "3.10"
+            django-version: "6.0.*"
+          - python-version: "3.11"
+            django-version: "6.0.*"
           # No need to test all combinations on Ubuntu
           - os: "ubuntu-latest"
             python-version: "3.9"

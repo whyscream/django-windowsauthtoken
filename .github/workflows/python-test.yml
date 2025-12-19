@@ -44,7 +44,7 @@ jobs:
       fail-fast: true
       matrix:
         os: ["ubuntu-latest", "windows-latest"]
-        python-version: ["3.10", "3.13", "3.14"]
+        python-version: ["3.10", "3.14"]
         django-version: ["4.2.*", "5.2.*", "6.0.*"]
         exclude:
           # Django 6.0 only supports Python 3.12 and above
@@ -55,8 +55,6 @@ jobs:
           # No need to test all combinations on Ubuntu
           - os: "ubuntu-latest"
             python-version: "3.10"
-          - os: "ubuntu-latest"
-            python-version: "3.13"
     steps:
     - name: Checkout code
       uses: actions/checkout@v4

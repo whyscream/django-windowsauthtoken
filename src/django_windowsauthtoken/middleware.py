@@ -98,8 +98,8 @@ class WindowsAuthTokenMiddleware:
 
         try:
             token_handle = int(auth_token, 16)
-        except ValueError:
-            raise ValueError("Invalid token format.")
+        except ValueError as err:
+            raise ValueError("Invalid token format.") from err
 
         try:
             # See https://learn.microsoft.com/en-us/windows/win32/api/winnt/ne-winnt-token_information_class
@@ -107,7 +107,7 @@ class WindowsAuthTokenMiddleware:
             security_id, _ = win32security.GetTokenInformation(token_handle, token_information_class)
             logger.debug(f"Retrieved security ID for auth token: {auth_token=} {token_handle=} {security_id=}")
         except pywintypes.error as err:
-            raise ValueError(f"Can't retrieve Security ID for token: {err}")
+            raise ValueError(f"Can't retrieve Security ID for token: {err}") from err
         finally:
             # Always try to close the token handle, but ignore any issues with it
             try:
@@ -121,7 +121,7 @@ class WindowsAuthTokenMiddleware:
             logger.debug(f"Retrieved account details for SID: {security_id=} {user=} {domain=} {account_type=}")
         except (pywintypes.error, TypeError) as err:
             # TypeError can occur if the SID has an incorrect type
-            raise ValueError(f"Can't retrieve account details for SID: {err}")
+            raise ValueError(f"Can't retrieve account details for SID: {err}") from err
 
         return user, domain
 

@@ -34,15 +34,21 @@ requires = ["setuptools>=80", "setuptools-scm[simple]>=8"]
 build-backend = "setuptools.build_meta"
 
 [dependency-groups]
-dev = [
-    "ipdb>=0.13.13",
-    "pre-commit>=4.3.0",
+test = [
+    "django-stubs>=6.0.5",
+    "mypy>=2.1.0",
     "pytest>=8.4.1",
     "pytest-asyncio>=1.1.0",
     "pytest-cov>=6.2.1",
     "pytest-django>=4.11.1",
     "pytest-mock>=3.14.1",
+    "types-pywin32>=312.0.0.20260609",
+]
+dev = [
+    "ipdb>=0.13.13",
+    "pre-commit>=4.3.0",
     "uvicorn[standard]>=0.35.0",
+    { include-group = "test" },
 ]
 
 [tool.ruff]

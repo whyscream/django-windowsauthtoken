@@ -114,11 +114,24 @@ jobs:
       with:
         name: test-reports
 
+    - name: Extract package version
+      run: |
+        pip install setuptools-scm[simple]
+        echo "PACKAGE_VERSION=$(setuptools-scm --strip-dev -f plain)" >> $GITHUB_ENV
+
+    - name: Display extracted package version
+      run: |
+        echo Extracted package version: ${{ env.PACKAGE_VERSION }}
+
     - name: SonarQube Scan
       uses: SonarSource/sonarqube-scan-action@v8.2.0
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      with:
+        args: >
+            --define "sonar.projectVersion=${{ env.PACKAGE_VERSION }}"
+
 
     - name: SonarQube Quality Gate check
       uses: sonarsource/sonarqube-quality-gate-action@v1.2.0

@@ -71,13 +71,18 @@ jobs:
 
     - name: Install dependencies
       run: |
-        uv sync --locked --dev --no-install-package django
+        uv sync --locked --group test --no-install-package django
         uv pip install "django==${{ matrix.django-version }}"
         uv pip freeze
 
     - name: Run tests
       run: |
-        uv run pytest --cov-report xml:coverage.xml --junitxml=pytest.xml --cov-fail-under=80
+        uv run pytest --cov-report xml:test-reports/coverage.xml --junitxml=test-reports/pytest.xml --cov-fail-under=80
+      continue-on-error: true  # Always continue to upload reports
+
+    - name: Check type annotations
+      run: |
+        uv run mypy --junit-xml test-reports/mypy.xml src
       continue-on-error: true  # Always continue to upload reports
 
     - name: Upload coverage and test reports
@@ -85,10 +90,9 @@ jobs:
       if: ${{ matrix.os == 'windows-latest' && matrix.python-version == '3.14' && matrix.django-version == '5.2.*' }}
       uses: actions/upload-artifact@v7.0.1
       with:
-        name: test-report
-        path: |
-          coverage.xml
-          pytest.xml
+        name: test-reports
+        path: test-reports/
+        compression-level: 9
 
   sonarqube:
     runs-on: ubuntu-latest
@@ -104,19 +108,11 @@ jobs:
       uses: actions/setup-python@v6.2.0
       with:
         python-version: 3.14
-    - name: Install Mypy
-      run: |
-        python -m pip install mypy django-stubs types-pywin32
 
-    - name: Run MyPy
-      run: |
-        mypy --strict --junit-xml mypy.xml src
-      continue-on-error: true
-
-    - name: Download coverage report
+    - name: Download test reports
       uses: actions/download-artifact@v8.0.1
       with:
-        name: test-report
+        name: test-reports
 
     - name: SonarQube Scan
       uses: SonarSource/sonarqube-scan-action@v8.2.0

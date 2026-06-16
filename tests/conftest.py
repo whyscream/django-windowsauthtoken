@@ -26,5 +26,5 @@ def pytest_configure():
             "django.contrib.auth.backends.RemoteUserBackend",
         ],
         ROOT_URLCONF="urlconf",
-        SECRET_KEY="django-insecure-test-key",
+        SECRET_KEY="django-insecure-test-key",  # noqa: S106
     )

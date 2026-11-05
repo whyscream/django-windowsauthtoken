@@ -9,7 +9,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django_windowsauthtoken.middleware import WindowsAuthTokenMiddleware
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_pywin32(mocker):
     """Fixture to mock pywin32 components used in the middleware."""
     mock_win32security = mocker.patch("django_windowsauthtoken.middleware.win32security")

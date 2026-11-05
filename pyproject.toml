@@ -39,7 +39,7 @@ build-backend = "setuptools.build_meta"
 test = [
     "django-stubs>=6.0.5",
     "mypy>=2.1.0",
-    "pytest>=8.4.1",
+    "pytest>=9.0.0",
     "pytest-asyncio>=1.1.0",
     "pytest-cov>=6.2.1",
     "pytest-django>=4.11.1",
@@ -77,8 +77,8 @@ branch = true
 relative_files = true
 source = ["django_windowsauthtoken"]
 
-[tool.pytest.ini_options]
-addopts = "--cov --cov-report=term-missing"
+[tool.pytest]
+addopts = ["--cov", "--cov-report=term-missing"]
 asyncio_default_fixture_loop_scope = "function"
 
 [tool.mypy]

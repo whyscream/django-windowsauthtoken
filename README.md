@@ -110,7 +110,7 @@ When developing on a non-Windows system, you can work around the absence of `pyw
 WINDOWSAUTHTOKEN_IGNORE_PYWIN32_ERRORS=true
 ```
 
-This will allow you to run the tests and work on the code without `pywin32`, but note that for the middleware to return actual usernames, the package is required.
+This will allow you to run the tests and work on the code without `pywin32`. Just note that for the middleware to return actual usernames from the OS, the package is still required (tests work with mocks).
 
 ### Running Tests
 

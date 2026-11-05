@@ -11,7 +11,7 @@ from .formatters import DEFAULT_FORMATTER, FormattingError
 
 logger = logging.getLogger("windowsauthtoken")
 
-_IGNORE_PYWIN32_ERRORS = os.getenv("WINDOWSAUTHTOKEN_IGNORE_PYWIN32_ERRORS", "false") == "true"
+_IGNORE_PYWIN32_ERRORS: bool = os.getenv("WINDOWSAUTHTOKEN_IGNORE_PYWIN32_ERRORS", "false") == "true"
 """Flag to ignore platform-specific errors, useful for non-Windows environments."""
 
 try:  # pragma: no cover
